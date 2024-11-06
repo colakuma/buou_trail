@@ -113,10 +113,10 @@ class MultiAssetTradingBot:
     def fetch_positions(self):
         try:
             positions = self.exchange.fetch_positions()
-            return positions
+            return positions, True
         except Exception as e:
             self.logger.error(f"Error fetching positions: {e}")
-            return []
+            return [], False
 
     def close_position(self, symbol, side):
         try:
@@ -139,7 +139,10 @@ class MultiAssetTradingBot:
             return False
 
     def monitor_positions(self):
-        positions = self.fetch_positions()
+        positions, success = self.fetch_positions()
+        if not success:
+            return
+            
         current_symbols = set(position['symbol'] for position in positions if float(position['contracts']) != 0)
 
         closed_symbols = self.detected_positions - current_symbols

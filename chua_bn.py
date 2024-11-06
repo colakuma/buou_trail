@@ -91,10 +91,10 @@ class MultiAssetTradingBot:
     def fetch_positions(self):
         try:
             positions = self.exchange.fetch_positions()
-            return positions
+            return positions, True
         except Exception as e:
             self.logger.error(f"Error fetching positions: {e}")
-            return []
+            return [], False
 
     def close_position(self, symbol, amount, side):
         try:
@@ -112,7 +112,10 @@ class MultiAssetTradingBot:
 
     def monitor_positions(self):
         print()  # 输出一个空行，便于阅读日志
-        positions = self.fetch_positions()
+        positions, success = self.fetch_positions()
+        if not success:
+            return
+            
         for position in positions:
             symbol = position['symbol']
             position_amt = float(position['info']['positionAmt'])  # 使用 positionAmt 来获取仓位数量
